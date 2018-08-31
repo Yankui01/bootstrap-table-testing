@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Backend Data Table Testing</title>
+	<!-- Jquery JS引用 -->
+	<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+
+	<!-- Bootstrap table JS引用 -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap-table/1.12.1/bootstrap-table.css" type="text/css" />    
+	<script src="https://cdn.bootcss.com/bootstrap-table/1.12.1/bootstrap-table.js"></script>
+
+	<!-- Jquery table JS引用 -->
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" type="text/css" />
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+</head>
+
+<body>
+
+<h1><font color='red'>Jquery  DataTable testing</font></h1>
+<table id="example" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>First name</th>
+                <th>Last name</th>
+                <th>Position</th>
+                <th>Office</th>
+                <th>Start date</th>
+                <th>Salary</th>
+            </tr>
+        </thead>
+</table>
+
+
+<hr/><hr/><br/><br/><br/>
+<h1><font color='red'>Jquery  DataTable testing2</font></h1>
+<table id="table2" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th> name</th>
+                <th>sex </th>
+                <th>age</th>
+            </tr>
+        </thead>
+</table>
+<hr/><hr/><br/><br/><br/>
+
+
+<h1><font color='red'>bootstrapTable  testing()跨域</font></h1>
+<table id="table3"></table>
+
+<hr/><hr/><br/><br/><br/>
+<input type="button" value="show table1" class="form-control" onclick="getvalue1()"/>
+<input type="button" value="show table2" class="form-control" onclick="getvalue2()"/>
+<input type="button" value="show table3" class="form-control" onclick="getvalue3()"/>
+
+<div id="employeeInfo" class="box-content">
+</div>
+
+  <script type="text/javascript">
+  
+function getvalue1()  {
+    $('#example').DataTable( {
+        ajax: {
+            url: "http://localhost:8081/listUsers",
+            dataType: "jsonp",
+          "jsonp":"callback",
+          "jsonpCallback":"success_jsonpCallback"
+        }
+    } );
+} 
+
+function getvalue2() { 
+		   $('#table2').DataTable( {
+				"processing": true,
+				"serverSide": true,
+				ajax: {
+					url: "http://localhost:8081/listUsers2",
+					dataType: "jsonp",
+				  "jsonp":"callback",
+				  "jsonpCallback":"success_jsonpCallback"
+					}
+				} );
+}
+
+	
+function getvalue3() { 
+		$.ajax({			
+			"url": "http://localhost:8081/listUsers3",
+			"dataType": "jsonp",
+			 "jsonp":"callback",
+			"jsonpCallback":"success_jsonpCallback",
+	        "success":function(json,status){
+							console.log(json);
+							               for(var i = 0; i < json.rows.length; i++){
+												if(i == '0' && json.state == '3'){
+													json.rows[i].icon = 'end';
+												}else if(i == json.rows.length-1){
+													json.rows[i].icon = 'start';
+												}else{
+													json.rows[i].icon = 'step';
+												}
+											};
+
+					  		console.log(status + "用户信息111："+json.rows[1].id);
+							switch(status){
+									case 'success':
+											   creatbootstrapTable($('.table-progress'),json.rows);
+											   break;
+									   default :
+											   alert('error');
+											   break;
+								}
+					}
+		});
+}
+	
+//调用bootstrapTable控件，数据用传入的json data.
+function creatbootstrapTable($_obj, tableData){
+	    var table = $('#table3').bootstrapTable({
+	    	//url: "http://localhost:8081/listUsers3",
+			data: tableData,
+            dataType: "json",
+	        method: 'get',                      //请求方式（*）
+	        //toolbar: '#toolbar',                //工具按钮用哪个容器
+	        striped: true,                      //是否显示行间隔色
+	        cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+	        pagination: true,                   //是否显示分页（*）
+	        sortable: false,                     //是否启用排序
+	        sortOrder: "asc",                   //排序方式
+	        sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+	        pageNumber:1,                       //初始化加载第一页，默认第一页
+	        pageSize: 8,                       //每页的记录行数（*）
+	        pageList: [8,10, 25, 50, 100],        //可供选择的每页的行数（*）
+	        search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+	        strictSearch: true,
+	        showColumns: false,                  //是否显示所有的列
+	        showRefresh: true,                  //是否显示刷新按钮
+	        minimumCountColumns: 2,             //最少允许的列数
+	        clickToSelect: true,                //是否启用点击选中行
+	        //height: 500,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+	        showToggle:false,                    //是否显示详细视图和列表视图的切换按钮
+	        cardView: false,                    //是否显示详细视图
+	        detailView: false,                  //是否显示父子表
+	        //得到查询的参数
+	        queryParams : function (params) {
+	        	return {
+	        		pageSize: params.limit,
+	        		pageNumber: params.offset/params.limit+1,
+	            };
+	        },
+	        columns: [{
+	            checkbox: true,  
+	            visible: true                  //是否显示复选框  
+	        },{
+	            field: 'id',
+	            title: 'id'
+
+	        },{
+	            field: 'name',
+	            title: 'name'
+
+	        },{
+	            field: 'age',
+	            title: 'age'
+
+	        }],
+	        onLoadSuccess: function (sta) {
+					console.log("in onLoadSuccess");
+					console.log(sta);
+	        },
+	        onLoadError: function (status, res) { //加载失败时执行
+	        	  alert("onLoadError");
+	              console.log(res);
+	              console.log(status);
+	          }
+	    });
+	}
+ </script>
+</body>
+</html>
+

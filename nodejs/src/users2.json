@@ -1,0 +1,26 @@
+success_jsonpCallback(
+
+{
+  "draw": 1,
+  "recordsTotal": 57,
+  "recordsFiltered": 57,
+  "data": [
+    [
+      "zhangsan",
+      "male",
+      "18"
+    ],
+    [
+      "lisi",
+      "female",
+      "25"
+    ]
+  ]
+}
+
+
+
+
+
+
+)
